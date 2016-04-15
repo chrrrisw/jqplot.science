@@ -10,12 +10,12 @@
 </style>
 <!-- JQPLOT -->
 <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="excanvas.js"></script><![endif]-->
-<script type="text/javascript" src="../../jquery.min.js"></script>
-<script type="text/javascript" src="../../jqplot/jquery.jqplot.js"></script>
-<script type="text/javascript" src="../../jqplot/plugins/jqplot.canvasTextRenderer.js"></script>
-<script type="text/javascript" src="../../jqplot/plugins/jqplot.canvasAxisLabelRenderer.js"></script>
-<script type="text/javascript" src="../../jqplot/plugins/jqplot.canvasAxisTickRenderer.js"></script>
-<script type="text/javascript" src="../../jqplot/plugins/jqplot.cursor.js"></script>
+<script type="text/javascript" src="../jqplot/jquery.min.js"></script>
+<script type="text/javascript" src="../jqplot/jquery.jqplot.js"></script>
+<script type="text/javascript" src="../jqplot/plugins/jqplot.canvasTextRenderer.js"></script>
+<script type="text/javascript" src="../jqplot/plugins/jqplot.canvasAxisLabelRenderer.js"></script>
+<script type="text/javascript" src="../jqplot/plugins/jqplot.canvasAxisTickRenderer.js"></script>
+<script type="text/javascript" src="../jqplot/plugins/jqplot.cursor.js"></script>
 <script type="text/javascript" src="sansimg.js"></script>
 <script type="text/javascript" src="../interactors/interactors.js"></script>
 <script type="text/javascript" src="../interactors/magik_sim.js"></script>
@@ -45,7 +45,7 @@ window.onload = function() {
             var inst = interactors[i][0], width = interactors[i][1], height = interactors[i][2];
         else
             var inst = interactors[i], width = 300, height = 300;
-        
+
         var lb = document.createElement('label');
         lb.setAttribute('for', id);
         var cv = document.createElement('canvas');
@@ -57,13 +57,13 @@ window.onload = function() {
         dv.appendChild(lb);
         dv.appendChild(cv);
         document.body.appendChild(dv);
-        
+
         c[i + 1] = new inst();
         c[i + 1].init(id);
         if (c[i+1].name == 'Annulus') c[i + 1].showdata = true;
         lb.appendChild(document.createTextNode(c[i + 1].name + 'Interactor'));
     }
-    
+
 };
 
 //window.onresize = function() {window.location.href = window.location.href;}

@@ -3,11 +3,11 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<title>Plot from Dataflow</title>
 		<!-- JQPLOT -->
-		<script type="text/javascript" src="../../jquery.min.js"></script>
-		<script type="text/javascript" src="../../jqplot/jquery.jqplot.js"></script>
-		<script type="text/javascript" src="../../jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
-		<script type="text/javascript" src="../../jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
-		<script type="text/javascript" src="../../jqplot/plugins/jqplot.cursor.js"></script>
+		<script type="text/javascript" src="../jqplot/jquery.min.js"></script>
+		<script type="text/javascript" src="../jqplot/jquery.jqplot.js"></script>
+		<script type="text/javascript" src="../jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
+		<script type="text/javascript" src="../jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+		<script type="text/javascript" src="../jqplot/plugins/jqplot.cursor.js"></script>
 		<script type="text/javascript" src="../plugins/jqplot.errorbarRenderer.js"></script>
 		<script type="text/javascript" src="../plugins/jqplot.colorbarRenderer.js"></script>
 		<script type="text/javascript" src="../plugins/jqplot.heatmapRenderer.js"></script>
@@ -21,14 +21,14 @@
 		<!-- Uniq Array -->
 		<script type="text/javascript" src="UniqArray.js"></script>
 		<script type="text/javascript" src="js-object-length.js"></script>
-		
+
 		<script type="text/javascript" src="test_data2.js"></script>
 		<style>
 			img {
 			    image-rendering: -moz-crisp-edges;
 			    image-rendering: -webkit-optimize-contrast;
 			    -ms-interpolation-mode: nearest-neighbor;
-			}   
+			}
 		</style>
 		<script type="text/javascript">
 window.onload = function() {
@@ -44,12 +44,12 @@ window.onload = function() {
   plot = $.jqplot('plot', data.z, {
     cursor: {show: true, zoom: false},
     sortData: false,
-    interactors: [{ type:'Rectangle', 
+    interactors: [{ type:'Rectangle',
       name:'rectangle',
       showrect: false,
-      xmin: data.dims.xmin, 
+      xmin: data.dims.xmin,
       ymin: data.dims.ymin,
-      xmax: data.dims.xmax, 
+      xmax: data.dims.xmax,
       ymax: data.dims.ymax}],
     renderer: $.jqplot.heatmapRender,
     series: [ {shadow: false, padding: 0} ],
@@ -66,9 +66,9 @@ window.onload = function() {
                         ymax: data.dims.ymax+1,
                         xmax: data.dims.xmax+1}
       },
-    }, 
+    },
   });
-		        
+
   colorbar = $.jqplot('colorbar', data.z, {
     //cursor: {show: true, zoom: true},
     sortData: false,
@@ -89,7 +89,7 @@ window.onload = function() {
                         zmax: data.dims.zmax }
       },
     },
-    axes:{ 
+    axes:{
       xaxis:{ tickOptions: {show: false} },
       y2axis:{
         //label: 'Intensity',
@@ -97,9 +97,9 @@ window.onload = function() {
         tickRenderer: $.jqplot.CanvasAxisTickRenderer,
         tickOptions: { formatString: "%.4P" }
       }
-    }, 
+    },
   });
-		        
+
   function matchPlotToColorbar() {
     var new_dims = {};
     var cb = colorbar.series[0];
@@ -108,23 +108,23 @@ window.onload = function() {
     new_dims.zmin = cb.tinv(cb._yaxis.min);
     $.extend(plot.series[0].dims, new_dims, true);
     plot.series[0].update_plotdata();
-    plot.replot();	
+    plot.replot();
   };
-  colorbar.plugins._interactor.zoomPlot = function(dzoom, centerpos) {
-    $.jqplot.MasterInteractorPlugin.prototype.zoomPlot.call(colorbar.plugins._interactor, dzoom, centerpos);
-    matchPlotToColorbar();		            
+  colorbar.plugins._interactor.zoomPlot = function(dzoomx, dzoomy, centerpos) {
+    $.jqplot.MasterInteractorPlugin.prototype.zoomPlot.call(colorbar.plugins._interactor, dzoomx, dzoomy, centerpos);
+    matchPlotToColorbar();
   };
-		        
+
   colorbar.plugins._interactor.zoomMax = function() {
     $.jqplot.MasterInteractorPlugin.prototype.zoomMax.call(colorbar.plugins._interactor);
-    matchPlotToColorbar();	            
+    matchPlotToColorbar();
   };
-		        
+
   colorbar.plugins._interactor.panPlot = function(pos) {
     $.jqplot.MasterInteractorPlugin.prototype.panPlot.call(colorbar.plugins._interactor, pos);
     matchPlotToColorbar();
   };
-		        
+
   generate_cumsums = function() {
     var width = plot.series[0].dims.xdim;
     var height = plot.series[0].dims.ydim;
@@ -135,7 +135,7 @@ window.onload = function() {
     // initialize the y-sum:
     for (var r = 0; r<height; r++) ysum.push(0);
     cumsum_y.push(ysum.slice());
-                    
+
     for (var c = 0; c < width; c++) {
       cumsum_x_col = [0]; xsum = 0;
       cumsum_y_col = [];
@@ -154,17 +154,17 @@ window.onload = function() {
     plot.series[0].cumsum_x = cumsum_x;
     plot.series[0].cumsum_y = cumsum_y;
   };
-		        
+
   yslice = $.jqplot('yslice', [[[1,1],[1,2],[0.5,3],[2,4]]], {
-    grid: {shadow: false}, 
-    sortData: false, 
+    grid: {shadow: false},
+    sortData: false,
     series: [ {shadow: false, color: 'red', markerOptions: {shadow: false, size: 4}} ]
   });
   xslice = $.jqplot('xslice', [[1,2,3,4]], {
-    grid: {shadow: false}, 
-    sortData: false, 
+    grid: {shadow: false},
+    sortData: false,
     series: [ {shadow: false, color: 'blue', markerOptions: {shadow: false, size: 4}} ],
-    axes:{ 
+    axes:{
       xaxis:{ tickOptions: {show: false} },
       yaxis:{
         //label: 'Intensity',
@@ -172,7 +172,7 @@ window.onload = function() {
         tickRenderer: $.jqplot.CanvasAxisTickRenderer,
         tickOptions: { formatString: "%.4P", _styles: {left: 10} }
       }
-    }, 
+    },
   });
 
   var slicebox = plot.plugins.interactors.rectangle;
@@ -204,9 +204,9 @@ window.onload = function() {
     yminctl.update_external();
   }
   maxbutton.onclick = maximize;
-                
+
   document.getElementById('slicecontrols').appendChild(maxbutton);
-                
+
   var slice_listener = function() {
     slicebox.p1.listeners.push(this);
     slicebox.p3.listeners.push(this);
@@ -239,13 +239,13 @@ window.onload = function() {
       yslice.grid._offsets.left = yslice.axes.yaxis._elem.width();
       yslice.replot();
     };
-    return this;  
+    return this;
   };
   var sl = slice_listener();
   generate_cumsums();
   maximize();
 } // end onLoad
-		    
+
 pointTextControl = function(p, coord, label, precision) {
   // coord should be 'x' or 'y'
   var precision = precision || 3;
@@ -271,14 +271,14 @@ pointTextControl = function(p, coord, label, precision) {
   var me = this;
   this.update_external = function() {
     var mypos = {}; mypos[coord] = textbox.value;
-                    
+
     var newpos = p.putCoords ? p.putCoords(mypos) : mypos;
     var dpos = {}; dpos[coord] = newpos[coord] - p.pos[coord];
     p.move(dpos);
     p.parent.onDrag();  // centers
     p.parent.redraw();
   }
-                
+
   textbox.onchange = this.update_external;
   p.listeners.push(this);
   this.update(p.getCoords());

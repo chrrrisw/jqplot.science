@@ -5,12 +5,12 @@
 <title>jqPlot error bars</title>
 
 <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="jqplot/excanvas.js"></script><![endif]-->
-<script language="javascript" type="text/javascript" src="../../jqplot/jquery.min.js"></script>
-<script language="javascript" type="text/javascript" src="../../jqplot/jquery.jqplot.js"></script>
+<script language="javascript" type="text/javascript" src="../jqplot/jquery.min.js"></script>
+<script language="javascript" type="text/javascript" src="../jqplot/jquery.jqplot.js"></script>
 <script language="javascript" type="text/javascript" src="../plugins/jqplot.errorbarRenderer.js"></script>
-<script language="javascript" type="text/javascript" src="../../jqplot/plugins/jqplot.logAxisRenderer.js"></script>
-<script language="javascript" type="text/javascript" src="../../jqplot/plugins/jqplot.AxisTickRenderer.js"></script>
-<link rel="stylesheet" type="text/css" href="../../jqplot/jquery.jqplot.css" />
+<script language="javascript" type="text/javascript" src="../jqplot/plugins/jqplot.logAxisRenderer.js"></script>
+<script language="javascript" type="text/javascript" src="../jqplot/plugins/jqplot.canvasAxisTickRenderer.js"></script>
+<link rel="stylesheet" type="text/css" href="../jqplot/jquery.jqplot.css" />
 <style rel="stylesheet" type="text/css">
 .jqplot-target { font-family: helvetica; }
 </style>
@@ -21,7 +21,7 @@ var data =
     points: [ [2,2],[4,3],[6,5],[9,7] ],
     yerr:   [ [2,null],[1,2],[1,2],[1,2] ],
     xerr:   [ [1,1],[null,1],[0,0],1 ]
-    
+
   }
 ];
 
