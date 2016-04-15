@@ -47,9 +47,6 @@
      *
      * > series: [{renderer:$.jqplot.errorbarRenderer}]
      *
-     * For errorbar and candlestick charts, data should be specified
-     * like so:
-     *
      * Data must be supplied in one of these forms:
      *
      * > data = [[x1, y1, { xerr: xerr1,            yerr: yerr1            }, mask ], ...]
@@ -59,43 +56,37 @@
     $.jqplot.errorbarRenderer = function() {
         // subclass line renderer to make use of some of it's methods.
         $.jqplot.LineRenderer.call(this);
-        // prop: candleStick
-        // true to render chart as candleStick.
-        // Must have an open price, cannot be a hlc chart.
-        this.candleStick = false;
         // prop: tickLength
-        // length of the line in pixels indicating open and close price.
+        // length of the line in pixels indicating ends of the error bars.
         // Default will auto calculate based on plot width and
         // number of points displayed.
         this.tickLength = 'auto';
-        // prop: bodyWidth
-        // width of the candlestick body in pixels.  Default will auto calculate
-        // based on plot width and number of candlesticks displayed.
-        this.bodyWidth = 'auto';
-        // prop: openColor
-        // color of the open price tick mark.  Default is series color.
-        this.openColor = null;
-        // prop: closeColor
-        // color of the close price tick mark.  Default is series color.
-        this.closeColor = null;
-        // prop: wickColor
+        // prop: maxColor
+        // color of the max error tick mark.  Default is series color.
+        this.maxColor = null;
+        // prop: minColor
+        // color of the min error tick mark.  Default is series color.
+        this.minColor = null;
+        // prop: barColor
         // color of the hi-lo line thorugh the candlestick body.
         // Default is the series color.
-        this.wickColor = null;
-        // prop: hlc
-        // true if is a hi-low-close chart (no open price).
-        // This is determined automatically from the series data.
-        this.hlc = false;
-        // prop: showLine
+        this.barColor = null;
+        // prop: mean
+        // color of the hi-lo line thorugh the candlestick body.
+        // Default is true.
+        this.mean = true;
+        // prop: meanColor
+        // color of the hi-lo line thorugh the candlestick body.
+        // Default is the series color.
+        this.meanColor = null;
+        // prop: errorBar
         // true to plot the line with LineRenderer on the series data
         // defaults to true
-        this.errorBar = false;
+        this.errorBar = true;
         // prop: lineWidth
-        // Width of the hi-low line and open/close ticks.
+        // Width of the hi-low line and min/max ticks.
         // Must be set in the rendererOptions for the series.
         this.lineWidth = 1.5;
-        this._tickLength = undefined;
-        this._bodyWidth = undefined;
     };
 
     $.jqplot.errorbarRenderer.prototype = new $.jqplot.LineRenderer();
@@ -139,7 +130,6 @@
             var xp = this._xaxis.series_u2p;
             var yp = this._yaxis.series_u2p;
             var i, prevColor, ops, b, h, w, a, points;
-            var o;
             var r = this.renderer;
             var opts = (options !== undefined) ? options : {};
             var shadow = (opts.shadow !== undefined) ? opts.shadow : this.shadow;
@@ -170,18 +160,10 @@
                     dinterval = dwidth / nvisiblePoints;
                 }
 
-                if (r.candleStick) {
-                    if (typeof(r.bodyWidth) == 'number') {
-                        r._bodyWidth = r.bodyWidth;
-                    } else {
-                        r._bodyWidth = Math.min(20, dinterval / 1.75);
-                    }
+                if (typeof(r.tickLength) == 'number') {
+                    r._tickLength = r.tickLength;
                 } else {
-                    if (typeof(r.tickLength) == 'number') {
-                        r._tickLength = r.tickLength;
-                    } else {
-                        r._tickLength = Math.min(10, dinterval / 3.5);
-                    }
+                    r._tickLength = Math.min(10, dinterval / 3.5);
                 }
 
                 for (i = xminidx; i < xmaxidx; i++) {
@@ -192,75 +174,84 @@
                     xl = xp(d[i][2].xlower);
                     yu = yp(d[i][2].yupper);
                     yl = yp(d[i][2].ylower);
-                    close = yp(d[i][1]);
-                    //console.log('[',i,']: (x:',d[i][2].xlower,',',d[i][0],',',d[i][2].xupper,'; y:',d[i][2].ylower,',',d[i][1],',',d[i][2].yupper,')');
-
-                    o = {};
 
                     prevColor = opts.color;
-                    if (r.openColor) {
-                        opts.color = r.openColor;
+
+                    // draw bar
+                    if (r.barColor) {
+                        opts.color = r.barColor;
                     }
-                    // draw open tick
-                    opts.color = prevColor;
-                    // draw wick
-                    if (r.wickColor) {
-                        opts.color = r.wickColor;
-                    }
-                    // draw horizontal line of upper and lower bound
+                    // draw vertical line from upper to lower bound
                     r.shapeRenderer.draw(ctx, [
                         [x, yu],
                         [x, yl]
                     ], opts);
-                    // draw vertical line of upper and lower bound
+                    // draw horizontal line from upper to lower bound
                     r.shapeRenderer.draw(ctx, [
                         [xu, y],
                         [xl, y]
                     ], opts);
 
+                    // draw max
                     opts.color = prevColor;
-                    if (r.openColor) {
-                        opts.color = r.openColor;
+                    if (r.maxColor) {
+                        opts.color = r.maxColor;
                     }
-                    if (yu !== null)
-                    // draw upper bound horizontal line
+                    if (yu !== null) {
+                        // draw upper bound horizontal line
                         r.shapeRenderer.draw(ctx, [
-                        [x + r._tickLength / 2, yu],
-                        [x - r._tickLength / 2, yu]
-                    ], opts);
-                    if (xu !== null)
-                    // draw upper bound vertical line
-                        r.shapeRenderer.draw(ctx, [
-                        [xu, y + r._tickLength / 2],
-                        [xu, y - r._tickLength / 2]
-                    ], opts);
-
-                    opts.color = prevColor;
-                    if (r.closeColor) {
-                        opts.color = r.closeColor;
+                            [x + r._tickLength / 2, yu],
+                            [x - r._tickLength / 2, yu]
+                        ], opts);
                     }
-                    if (yl !== null)
-                    // draw lower bound horizontal line
+                    if (xu !== null) {
+                        // draw upper bound vertical line
                         r.shapeRenderer.draw(ctx, [
-                        [x + r._tickLength / 2, yl],
-                        [x - r._tickLength / 2, yl]
-                    ], opts);
-                    if (xl !== null)
-                    // draw lower bound vertical line
-                        r.shapeRenderer.draw(ctx, [
-                        [xl, y + r._tickLength / 2],
-                        [xl, y - r._tickLength / 2]
-                    ], opts);
+                            [xu, y + r._tickLength / 2],
+                            [xu, y - r._tickLength / 2]
+                        ], opts);
+                    }
 
+                    // draw min
+                    opts.color = prevColor;
+                    if (r.minColor) {
+                        opts.color = r.minColor;
+                    }
+                    if (yl !== null) {
+                        // draw lower bound horizontal line
+                        r.shapeRenderer.draw(ctx, [
+                            [x + r._tickLength / 2, yl],
+                            [x - r._tickLength / 2, yl]
+                        ], opts);
+                    }
+                    if (xl !== null) {
+                        // draw lower bound vertical line
+                        r.shapeRenderer.draw(ctx, [
+                            [xl, y + r._tickLength / 2],
+                            [xl, y - r._tickLength / 2]
+                        ], opts);
+                    }
+
+                    // Draw mean
+                    if (r.mean) {
+                        opts.color = prevColor;
+                        if (r.meanColor) {
+                            opts.fillStyle = r.meanColor;
+                        }
+                        // draw the mean
+                        console.log(opts.color);
+                        opts.fillRect = true;
+                        r.shapeRenderer.draw(
+                            ctx, [Math.round((xu + xl) / 2 - (r._tickLength / 4)),
+                                Math.round((yu + yl) / 2 - (r._tickLength / 4)),
+                                r._tickLength / 2,
+                                r._tickLength / 2
+                            ],
+                            opts);
+                        opts.fillRect = false;
+                    }
 
                     opts.color = prevColor;
-
-                    // draw the mean
-                    opts.fillRect = true;
-                    r.shapeRenderer.draw(ctx, [Math.round(x - (r._tickLength / 4)), Math.round(y - (r._tickLength / 4)), r._tickLength / 2, r._tickLength / 2], opts);
-
-                    opts.color = prevColor;
-                    opts.fillRect = false;
                 }
             }
 
@@ -281,7 +272,7 @@
                 showMarker: false,
                 tooltipAxes: 'y',
                 yvalues: 4,
-                formatString: '<table class="jqplot-highlighter"><tr><td>date:</td><td>%s</td></tr><tr><td>open:</td><td>%s</td></tr><tr><td>hi:</td><td>%s</td></tr><tr><td>low:</td><td>%s</td></tr><tr><td>close:</td><td>%s</td></tr></table>'
+                formatString: '<table class="jqplot-highlighter"><tr><td>date:</td><td>%s</td></tr><tr><td>max:</td><td>%s</td></tr><tr><td>hi:</td><td>%s</td></tr><tr><td>low:</td><td>%s</td></tr><tr><td>min:</td><td>%s</td></tr></table>'
             };
         }
     };
